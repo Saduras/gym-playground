@@ -13,6 +13,21 @@ def epsilon_greedy_policy(Q, observation, epsilon, nA):
 def lin_Q(observation, parameters):
     return np.matmul(observation.transpose(), parameters)
 
+def run_episode(env, policy, render=False):
+    episode = []
+    state = env.reset()
+    total_reward = 0
+    done = False
+    while not done: 
+        action = policy(state)
+        if render:
+            env.render()
+        next_state, reward, done, _ = env.step(action)
+        total_reward += reward
+        episode.append((state, action, reward))
+        state = next_state
+    return episode, total_reward
+    
 def monte_carlo_control(env, num_episodes, discount_factor=1.0, epsilon=0.1, learning_rate=0.1):
     # Init params for Q function
     q_params = np.random.rand(env.observation_space.shape[0], env.action_space.n)
@@ -29,17 +44,7 @@ def monte_carlo_control(env, num_episodes, discount_factor=1.0, epsilon=0.1, lea
 
         # Generate an episode
         # An episode is an array of (state, action, reward) tuples
-        episode = []
-        state = env.reset()
-        total_reward = 0
-        done = False
-        while not done: 
-            action = policy(state, q_params)
-            env.render()
-            next_state, reward, done, _ = env.step(action)
-            total_reward += reward
-            episode.append((state, action, reward))
-            state = next_state
+        episode, total_reward = run_episode(env, lambda x: policy(x, q_params))
 
         total_rewards.append(total_reward)
         
