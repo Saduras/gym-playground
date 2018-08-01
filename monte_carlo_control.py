@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from sklearn.linear_model import LinearRegression
 
 def epsilon_greedy_policy(Q, observation, epsilon, nA):
     # equal probability for all actions
@@ -32,9 +33,19 @@ def monte_carlo_control(env, num_episodes, discount_factor=1.0, epsilon=0.1, lea
     # Init params for Q function
     q_params = np.random.rand(env.observation_space.shape[0], env.action_space.n)
 
+    # initialize Q function with random training
+    Q = LinearRegression()
+    rand_X = np.array(np.random.rand(1, env.observation_space.shape[0]))
+    rand_y = np.array(np.random.rand(1, env.action_space.n))
+    print(rand_X.shape)
+    Q.fit(rand_X, rand_y)
+
     def policy(obs, params): 
-        return epsilon_greedy_policy(lambda z:lin_Q(z, params), obs, epsilon=epsilon, nA=env.action_space.n)
+        return epsilon_greedy_policy(lambda x: Q.predict([x]), obs, epsilon=epsilon, nA=env.action_space.n)
     
+    X_states = []
+    y_rewards = []
+
     total_rewards = []
     for i_epsiode in range(1, num_episodes + 1):
         # Print out current episode for debugging
@@ -49,17 +60,20 @@ def monte_carlo_control(env, num_episodes, discount_factor=1.0, epsilon=0.1, lea
         total_rewards.append(total_reward)
         
         # Update Q function
-        for state, action, reward in episode:
+        for state, action, _ in episode:
             # Find the first occurance of the (state, action) pair in the episode
             first_occurence_idx = next(i for i,x in enumerate(episode)
                                        if x[0].all() == state.all() and x[1] == action)
             # Sum up all rewards since the first occurance
             G = sum([x[2]*(discount_factor**i) for i,x in enumerate(episode[first_occurence_idx:])])
 
-            print(lin_Q(state, q_params)[action] - G)
-            loss = 1/2 * np.power(lin_Q(state, q_params)[action] - G, 2)
-            q_gradient = np.dot(state.transpose(), loss)
-            q_params[:,action] = q_params[:,action] - learning_rate * q_gradient
+            y = Q.predict([state])
+            y[0][action] = G
+            X_states.append(state)
+            y_rewards.append(y[0])
+
+        Q.fit(np.array(X_states), np.array(y_rewards))
+        # print(f"score {Q.score(X_states, y_rewards)}")
 
     return q_params, policy
 
@@ -71,7 +85,7 @@ def main():
     
     import gym
     env = gym.make('CartPole-v0')
-    q_params, policy = monte_carlo_control(env, 20000)
+    q_params, policy = monte_carlo_control(env, 20000, learning_rate=0.001)
 
 if __name__ == '__main__':
     main()
