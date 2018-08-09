@@ -50,7 +50,7 @@ def monte_carlo_control(env, num_episodes, policy, update_policy):
     for i_epsiode in range(1, num_episodes + 1):
         # Print out current episode for debugging
         if i_epsiode % 1000 == 0:
-            print(f"Episode {i_epsiode}/{num_episodes} mean reward {np.mean(total_rewards[-1000:])}")
+            print(f"Episode {i_epsiode}/{num_episodes} mean reward {np.mean(total_rewards[-1000:]):.3F} mean episode length {np.mean(episode_lengths[-1000:]):.3F}")
 
         state = env.reset()
         total_reward = 0
