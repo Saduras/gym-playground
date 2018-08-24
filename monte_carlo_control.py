@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 
 def monte_carlo_control(env, num_episodes, policy, update_policy):
     total_rewards = []
@@ -36,11 +35,9 @@ def main():
     import gym
     env = gym.make('CartPole-v0')    
 
-    tf.reset_default_graph()
-    with tf.Session() as sess:
-        from cart_pole_agent import cart_pole_agent
-        agent = cart_pole_agent(sess, env, state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99, batch_size=50)
-        total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.predict, agent.update_policy)
+    from cart_pole_agent import cart_pole_agent
+    agent = cart_pole_agent(env, state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99, batch_size=50)
+    total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.predict, agent.update_policy)
 
     print(f"Score over time: {sum(total_rewards) / num_episodes}")
 

@@ -3,11 +3,11 @@ import tensorflow as tf
 
 ### Source: https://github.com/breeko/Simple-Reinforcement-Learning-with-Tensorflow/blob/master/Part%202%20-%20Policy-based%20Agents.ipynb
 class cart_pole_agent():
-    def __init__(self, sess, environment, state_size, action_size, hidden_units, discount_factor=0.95, epsilon=0.1, learning_rate=0.1, batch_size=5):
+    def __init__(self, environment, state_size, action_size, hidden_units, discount_factor=0.95, epsilon=0.1, learning_rate=0.1, batch_size=5):
         self.discount_factor = discount_factor
         self.epsilon = epsilon
         self.learning_rate = learning_rate
-        self.sess = sess
+        self.sess = tf.InteractiveSession()
         self.env = environment
         self.state_size = state_size
         self.batch_size = batch_size
