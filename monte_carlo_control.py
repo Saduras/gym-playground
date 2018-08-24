@@ -39,7 +39,7 @@ def main():
     agent = cart_pole_agent(env, state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99, batch_size=50)
     total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.predict, agent.update_policy)
 
-    print(f"Score over time: {sum(total_rewards) / num_episodes}")
+    print(f"Overall mean score: {np.mean(total_rewards)} overall mean episode length: {np.mean(episode_lengths)}")
 
 if __name__ == '__main__':
     main()
