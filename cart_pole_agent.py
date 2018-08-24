@@ -53,14 +53,10 @@ class cart_pole_agent():
         self.saver.save(self.sess, path, global_step=global_step)
 
     def sample(self, state):
-        # Choose an action epsilon-greedy
-        if np.random.rand(1) < self.epsilon:
-            action = np.random.random_integers(0, self.action_size-1)
-        else:
-            state = state.reshape([1, -1])
-            a_dist = self.sess.run(self.output, feed_dict={self.observations: state})
-            action = np.round(a_dist).astype(int)
-            action = action[0][0]
+        # Use policy output to sample action probabilistic
+        state = state.reshape([1, -1])
+        a_dist = self.sess.run(self.output, feed_dict={self.observations: state})
+        action = int(np.random.uniform() < a_dist)
         return action
 
     def discount_rewards(self, rewards):
@@ -87,6 +83,3 @@ class cart_pole_agent():
             self.advantages: rewards
         }
         self.sess.run(self.train_op, feed_dict)
-
-        # Decay epsilon
-        self.epsilon = 1./((i_epsiode/50) + 10)
