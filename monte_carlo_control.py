@@ -36,8 +36,8 @@ def main():
     env = gym.make('CartPole-v0')    
 
     from cart_pole_agent import cart_pole_agent
-    agent = cart_pole_agent(env, state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99, batch_size=50)
-    total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.predict, agent.update_policy)
+    agent = cart_pole_agent(state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99, batch_size=50)
+    total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.sample, agent.train)
 
     print(f"Overall mean score: {np.mean(total_rewards)} overall mean episode length: {np.mean(episode_lengths)}")
 
