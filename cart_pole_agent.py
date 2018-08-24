@@ -48,9 +48,9 @@ class cart_pole_agent():
         print(f"Loading checkpoint: {path}")
         self.saver.restore(self.sess, path)
 
-    def save_checkpoint(self, path):
+    def save_checkpoint(self, path, global_step):
         print(f"Save checkpoint: {path}")
-        self.saver.save(self.sess, path)
+        self.saver.save(self.sess, path, global_step=global_step)
 
     def sample(self, state):
         # Choose an action epsilon-greedy

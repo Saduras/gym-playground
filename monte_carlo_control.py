@@ -40,7 +40,7 @@ def main():
     agent = cart_pole_agent(state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99)
 
     def save(i_epsiode):
-        agent.save_checkpoint(f"./checkpoints/cart_pole_{i_epsiode}.ckpt")
+        agent.save_checkpoint("./checkpoints/cart_pole.ckpt", global_step=i_epsiode)
 
     total_rewards, episode_lengths = monte_carlo_control(env, num_episodes, agent.sample, agent.train, save)
 
