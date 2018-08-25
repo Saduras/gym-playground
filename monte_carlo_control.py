@@ -59,8 +59,8 @@ def main():
     state_size = get_space_size(env.observation_space)
     action_size = get_space_size(env.action_space)
 
-    from cart_pole_agent import cart_pole_agent
-    agent = cart_pole_agent(state_size=state_size, action_size=action_size, hidden_units=10, learning_rate=.01, discount_factor=0.99)
+    from policy_network import policy_network
+    agent = policy_network(state_size=state_size, action_size=action_size, hidden_units=10, learning_rate=.01, discount_factor=0.99)
 
     def save(i_epsiode):
         agent.save_checkpoint(f"./checkpoints/{args.environment}.ckpt", global_step=i_epsiode)
