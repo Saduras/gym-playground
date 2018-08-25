@@ -78,7 +78,8 @@ class cart_pole_agent():
 
         rewards = np.vstack(self.discount_rewards(episode_array[:, 3]))
         rewards -= rewards.mean()
-        rewards /= rewards.std()
+        if rewards.std() != 0:
+            rewards /= rewards.std()
 
         feed_dict = {
             self.observations: states,
