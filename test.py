@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import gym
+import numpy as np
 from policy_network import load_network
 
 def main():
@@ -8,7 +9,8 @@ def main():
     parser.add_argument("environment", help="name of the gym environment to train on")
     args = parser.parse_args()
 
-    env = gym.make(args.environment)   
+    env = gym.make(args.environment)
+    obs_discrete = type(env.observation_space) is gym.spaces.Discrete   
 
     agent = load_network(f"./checkpoints/{args.environment}.ckpt", args.eps)
 
@@ -17,13 +19,18 @@ def main():
     for i_episode in range(1, num_episodes+1):
         total_reward = 0
         done = False
+
         state = env.reset()
+        if obs_discrete:
+            state = np.identity(env.observation_space.n)[state:state+1]
+
         while not done: 
             env.render()
             action = agent.sample(state)
-            next_state, reward, done, _ = env.step(action)
+            state, reward, done, _ = env.step(action)
+            if obs_discrete:
+                state = np.identity(env.observation_space.n)[state:state+1]
             total_reward += reward
-            state = next_state
 
         print(f"Episode {i_episode} finished with {total_reward}")
 
