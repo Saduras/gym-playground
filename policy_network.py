@@ -87,7 +87,7 @@ class policy_network():
             discounted_rewards[t] = running_add
         return discounted_rewards
 
-    def train(self, episode, i_epsiode):
+    def train(self, episode):
         episode_array = np.array(episode)
         states = np.vstack(episode_array[:, 0])
         actions = np.vstack(episode_array[:, 1])

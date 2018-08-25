@@ -34,7 +34,7 @@ def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoin
             total_reward += reward
             state = next_state
 
-        update_policy(episode, i_epsiode)
+        update_policy(episode)
 
         total_rewards.append(total_reward)
         episode_lengths.append(length)
