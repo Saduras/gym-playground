@@ -1,10 +1,17 @@
-def main():
-    import gym
-    env = gym.make('CartPole-v0')   
+from argparse import ArgumentParser
+import gym
+from policy_network import policy_network
 
-    from policy_network import policy_network
+def main():
+    parser = ArgumentParser()
+    parser.add_argument("--eps", help="number of episodes to learn", default=1000, type=int)
+    parser.add_argument("environment", help="name of the gym environment to train on")
+    args = parser.parse_args()
+
+    env = gym.make(args.environment)   
+
     agent = policy_network(state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99)
-    agent.load_checkpoint("./checkpoints/cart_pole.ckpt-10000")
+    agent.load_checkpoint(f"./checkpoints/{args.environment}.ckpt-{args.eps}")
 
     num_episodes = 10
 
