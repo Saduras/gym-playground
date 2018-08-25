@@ -5,6 +5,9 @@ from argparse import ArgumentParser
 def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoint):
     total_rewards = []
     episode_lengths = []
+
+    obs_discrete = type(env.observation_space) is gym.spaces.Discrete
+
     for i_epsiode in range(1, num_episodes + 1):
         # Print out current episode for debugging
         if i_epsiode % 1000 == 0:
@@ -12,6 +15,9 @@ def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoin
             save_checkpoint(i_epsiode)
 
         state = env.reset()
+        if obs_discrete:
+            state = np.identity(env.observation_space.n)[state:state+1]
+
         total_reward = 0
         done = False
         length = 0
@@ -21,6 +27,9 @@ def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoin
 
             action = policy(state)
             next_state, reward, done, _ = env.step(action)
+            if obs_discrete:
+                next_state = np.identity(env.observation_space.n)[next_state:next_state+1]
+
             episode.append((state, action, next_state, reward))
             total_reward += reward
             state = next_state
