@@ -23,17 +23,20 @@ class cart_pole_agent():
         )
         self.output = tf.layers.dense(
             hidden_layer,
-            units=1,
-            activation=tf.sigmoid,
+            units=action_size,
+            activation=tf.nn.softmax,
             kernel_initializer=tf.contrib.layers.xavier_initializer()
         )
 
         # Backwards pass
-        self.sampled_actions = tf.sampled_actions = tf.placeholder(tf.float32, shape=[None, 1], name="sampled_actions")
+        self.sampled_actions = tf.placeholder(tf.int32, shape=[None, 1], name="sampled_actions")
         self.advantages = tf.placeholder(tf.float32, shape=[None, 1], name="reward_signal")
 
+        # Convert list of action indicies into one hot vectors
+        one_hot_sampled = tf.one_hot(tf.reshape(self.sampled_actions,shape=[-1]) , self.action_size)
+        
         self.loss = tf.losses.log_loss(
-            labels=self.sampled_actions,
+            labels=one_hot_sampled,
             predictions=self.output,
             weights=self.advantages
         )
@@ -55,8 +58,8 @@ class cart_pole_agent():
     def sample(self, state):
         # Use policy output to sample action probabilistic
         state = state.reshape([1, -1])
-        a_dist = self.sess.run(self.output, feed_dict={self.observations: state})
-        action = int(np.random.uniform() < a_dist)
+        a_dist = self.sess.run(self.output, feed_dict={self.observations: state})[0]
+        action = np.random.choice(self.action_size, p=a_dist)
         return action
 
     def discount_rewards(self, rewards):
