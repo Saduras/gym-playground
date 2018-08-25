@@ -17,7 +17,7 @@ As policy network a 1-layer neural network is used to approximate the Q-value fu
 
 It is implemented in TensorFlow and heavily inspired by [Matthew Rahtz's Pong agent](https://github.com/mrahtz/tensorflow-rl-pong)
 
-Check out [cart_pole.py](./cart_pole.py) for implementation details.
+Check out [policy_network.py](./policy_network.py) for implementation details.
 
 ![Recording of final agent playing cart pole](./images/cart_pole_solved.gif)
 
