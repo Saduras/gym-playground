@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import gym
-from policy_network import policy_network
+from policy_network import load_network
 
 def main():
     parser = ArgumentParser()
@@ -10,8 +10,7 @@ def main():
 
     env = gym.make(args.environment)   
 
-    agent = policy_network(state_size=4, action_size=2, hidden_units=10, learning_rate=.01, discount_factor=0.99)
-    agent.load_checkpoint(f"./checkpoints/{args.environment}.ckpt-{args.eps}")
+    agent = load_network(f"./checkpoints/{args.environment}.ckpt", args.eps)
 
     num_episodes = 10
 

@@ -1,10 +1,19 @@
 import numpy as np
 import tensorflow as tf
+import yaml
+
+def load_network(path, global_step):
+    with open(f"{path}.params", "r") as file:
+        params = yaml.load(file)
+    pn = policy_network(params["state_size"], params["action_size"], params["hidden_units"], params["discount_factor"], params["learning_rate"])
+    pn.load_checkpoint(path, global_step)
+    return pn
 
 class policy_network():
     def __init__(self, state_size, action_size, hidden_units, discount_factor=0.95, learning_rate=0.1):
         self.state_size = state_size
         self.action_size = action_size
+        self.hidden_units = hidden_units
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
         self.sess = tf.InteractiveSession()
@@ -44,13 +53,23 @@ class policy_network():
 
         self.saver = tf.train.Saver()
 
-    def load_checkpoint(self, path):
+    def load_checkpoint(self, path, global_step):
+        path = f"{path}-{global_step}"
         print(f"Loading checkpoint: {path}")
         self.saver.restore(self.sess, path)
 
     def save_checkpoint(self, path, global_step):
         print(f"Save checkpoint: {path}")
         self.saver.save(self.sess, path, global_step=global_step)
+
+        with open(f"{path}.params", "w") as file:
+            yaml.dump({
+              "state_size": self.state_size,
+              "action_size": self.action_size,
+              "hidden_units": self.hidden_units,
+              "discount_factor": self.discount_factor,
+              "learning_rate": self.learning_rate
+            }, file)
 
     def sample(self, state):
         # Use policy output to sample action probabilistic
