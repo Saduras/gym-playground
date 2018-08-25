@@ -2,13 +2,12 @@ import numpy as np
 import tensorflow as tf
 
 class policy_network():
-    def __init__(self, state_size, action_size, hidden_units, discount_factor=0.95, epsilon=0.1, learning_rate=0.1):
-        self.discount_factor = discount_factor
-        self.epsilon = epsilon
-        self.learning_rate = learning_rate
-        self.sess = tf.InteractiveSession()
+    def __init__(self, state_size, action_size, hidden_units, discount_factor=0.95, learning_rate=0.1):
         self.state_size = state_size
         self.action_size = action_size
+        self.discount_factor = discount_factor
+        self.learning_rate = learning_rate
+        self.sess = tf.InteractiveSession()
 
         # Feed forward pass of the model
         self.observations = tf.placeholder(tf.float32, shape=[None, state_size], name="observations")
