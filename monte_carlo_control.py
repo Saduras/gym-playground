@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoint):
+def monte_carlo_control(env, num_episodes, sum_steps, policy, update_policy, save_checkpoint):
     total_rewards = []
     episode_lengths = []
 
@@ -9,8 +9,8 @@ def monte_carlo_control(env, num_episodes, policy, update_policy, save_checkpoin
 
     for i_epsiode in range(1, num_episodes + 1):
         # Print out current episode for debugging
-        if i_epsiode % 1000 == 0:
-            print(f"Episode {i_epsiode}/{num_episodes} mean reward {np.mean(total_rewards[-1000:]):.3F} mean episode length {np.mean(episode_lengths[-1000:]):.3F}")
+        if i_epsiode % sum_steps == 0:
+            print(f"Episode {i_epsiode}/{num_episodes} mean reward {np.mean(total_rewards[-sum_steps:]):.3F} mean episode length {np.mean(episode_lengths[-sum_steps:]):.3F}")
             save_checkpoint(i_epsiode)
 
         state = env.reset()

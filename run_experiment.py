@@ -15,6 +15,7 @@ def get_space_size(space):
 def main():
     parser = ArgumentParser()
     parser.add_argument("--num_eps", help="number of episodes to learn", default=1000, type=int)
+    parser.add_argument("--sum_steps", help="after how many steps a summary will be printed", default=200, type=int)
     parser.add_argument("environment", help="name of the gym environment to train on")
     args = parser.parse_args()
 
@@ -31,7 +32,7 @@ def main():
     def save(i_epsiode):
         agent.save_checkpoint(f"./checkpoints/{args.environment}.ckpt", global_step=i_epsiode)
 
-    total_rewards, episode_lengths = monte_carlo_control(env, args.num_eps, agent.sample, agent.train, save)
+    total_rewards, episode_lengths = monte_carlo_control(env, args.num_eps, args.sum_steps, agent.sample, agent.train, save)
 
     print(f"Overall mean score: {np.mean(total_rewards)} overall mean episode length: {np.mean(episode_lengths)}")
 
