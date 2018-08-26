@@ -10,7 +10,8 @@ def load_network(path, global_step):
     return pn
 
 class policy_network():
-    def __init__(self, state_size, action_size, hidden_units, discount_factor=0.95, learning_rate=0.1):
+    def __init__(self, state_dis, state_size, action_size, hidden_units, discount_factor=0.95, learning_rate=0.1):
+        self.state_dis = state_dis
         self.state_size = state_size
         self.action_size = action_size
         self.hidden_units = hidden_units
@@ -71,6 +72,9 @@ class policy_network():
             }, file)
 
     def sample(self, state):
+        if self.state_dis:
+            state = np.identity(self.state_size)[state:state+1]
+
         # Use policy output to sample action probabilistic
         state = state.reshape([1, -1])
         a_dist = self.sess.run(self.output, feed_dict={self.observations: state})[0]
@@ -97,7 +101,13 @@ class policy_network():
 
     def train(self, episode):
         episode_array = np.array(episode)
-        states = np.vstack(episode_array[:, 0])
+
+        if self.state_dis:
+            oh_states = [np.identity(self.state_size)[s:s+1] for s in episode_array[:, 0]]
+            states = np.vstack(oh_states)
+        else:
+            states = np.vstack(episode_array[:, 0])
+
         actions = np.vstack(episode_array[:, 1])
 
         rewards = np.vstack(self.discount_rewards(episode_array[:, 3]))

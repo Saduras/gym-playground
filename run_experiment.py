@@ -56,7 +56,7 @@ def cart_pole_exp(args):
     def save(i_epsiode):
         agent.save_checkpoint(f"./checkpoints/{args.environment}.ckpt", global_step=i_epsiode)
 
-    agent = policy_network(state_size=state_size, action_size=action_size, hidden_units=10, learning_rate=.01, discount_factor=0.99)
+    agent = policy_network(state_dis=False, state_size=state_size, action_size=action_size, hidden_units=10, learning_rate=.01, discount_factor=0.99)
 
     return monte_carlo_control(env, args.num_eps, args.sum_steps, agent.sample, agent.train, save)
 
