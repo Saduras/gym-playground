@@ -77,6 +77,15 @@ class policy_network():
         action = np.random.choice(self.action_size, p=a_dist)
         return action
 
+    def sample_eps_greedy(self, state, epsilon):
+        if np.random.uniform() < epsilon:
+            action = np.random.choice(range(self.action_size))
+        else:
+            state = state.reshape([1, -1])
+            a_dist = self.sess.run(self.output, feed_dict={self.observations: state})[0]
+            action = np.argmax(a_dist)
+        return action
+
     def discount_rewards(self, rewards):
         """ take 1D float array of rewards and compute discounted reward """
         discounted_rewards = np.zeros_like(rewards)
