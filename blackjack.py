@@ -48,7 +48,7 @@ def sample_eps_greedy(Q, state, epsilon):
 
 # Implementation of SARSA (state-action-reward-state-action)
 # also known as TD(0) (temporal difference)
-def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
+def monte_carlo_control(env, num_episodes, sum_steps, lr, gamma, eps):
     total_rewards = []
     episode_lengths = []
 
@@ -56,6 +56,9 @@ def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
     # (Player current sum, dealers showing card, player holds an ace)
     Q = defaultdict(lambda: np.zeros(env.action_space.n))
     actions = []
+
+    returns_sum = defaultdict(float)
+    returns_count = defaultdict(float)
 
     for i_epsiode in range(1, num_episodes + 1):
         # Print out current episode for debugging
@@ -72,20 +75,31 @@ def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
         done = False
         length = 0
         episode = []
-        while not done: 
+        while not done and length < 100: 
             length += 1
 
             action = sample_eps_greedy(Q, state, eps)
             next_state, reward, done, _ = env.step(action)
 
-            episode.append((state, action, next_state, reward))
-
-            Q[state][action] = Q[state][action] + lr * (reward + gamma * np.max(Q[next_state]) - Q[state][action])
-            Q[state][action] = np.clip(Q[state][action], -1, 1)
+            episode.append((state, action, reward))
 
             total_reward += reward
             actions.append(action)
             state = next_state
+
+        # Find all (state, action) pairs we've visited in this episode
+        # We convert each state to a tuple so that we can use it as a dict key
+        sa_in_episode = set([(tuple(x[0]), x[1]) for x in episode])
+        for state, action in sa_in_episode:
+            sa_pair = (state, action)
+            first_occurence_idx = next(i for i,x in enumerate(episode) if x[0] == state and x[1] == action)
+
+            # Sum all rewards since the first occurance
+            G = sum([x[2] * (gamma**i) for i,x in enumerate(episode[first_occurence_idx:])])
+
+            returns_sum[sa_pair] += G
+            returns_count[sa_pair] += 1
+            Q[state][action] = returns_sum[sa_pair] / returns_count[sa_pair]
 
         total_rewards.append(total_reward)
         episode_lengths.append(length)
@@ -107,10 +121,10 @@ def main():
     env = gym.make(env_name)
 
     lr = 0.1            # learning rate
-    gamma = 0.95        # discount factor
+    gamma = 1           # discount factor
     eps = 0.1           # epsilon - chance to pick a random action
 
-    total_rewards, episode_lengths = sarsa(env, num_eps, sum_steps, lr, gamma, eps)
+    total_rewards, episode_lengths = monte_carlo_control(env, num_eps, sum_steps, lr, gamma, eps)
 
     print(f"Overall mean score: {np.mean(total_rewards)} overall mean episode length: {np.mean(episode_lengths)}")
 
