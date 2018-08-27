@@ -2,6 +2,42 @@ import numpy as np
 import gym
 from collections import defaultdict
 
+def plot_value_function(V, title="Value Function"):
+    import matplotlib
+    from matplotlib import pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    """
+    Plots the value function as a surface plot.
+    """
+    min_x = min(k[0] for k in V.keys())
+    max_x = max(k[0] for k in V.keys())
+    min_y = min(k[1] for k in V.keys())
+    max_y = max(k[1] for k in V.keys())
+
+    x_range = np.arange(min_x, max_x + 1)
+    y_range = np.arange(min_y, max_y + 1)
+    X, Y = np.meshgrid(x_range, y_range)
+
+    # Find value for all (x, y) coordinates
+    Z_noace = np.apply_along_axis(lambda _: V[(_[0], _[1], False)], 2, np.dstack([X, Y]))
+    Z_ace = np.apply_along_axis(lambda _: V[(_[0], _[1], True)], 2, np.dstack([X, Y]))
+
+    def plot_surface(X, Y, Z, title):
+        fig = plt.figure(figsize=(20, 10))
+        ax = fig.add_subplot(111, projection='3d')
+        surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1,
+                               cmap=matplotlib.cm.coolwarm, vmin=-1.0, vmax=1.0)
+        ax.set_xlabel('Player Sum')
+        ax.set_ylabel('Dealer Showing')
+        ax.set_zlabel('Value')
+        ax.set_title(title)
+        ax.view_init(ax.elev, -120)
+        fig.colorbar(surf)
+        plt.show()
+
+    plot_surface(X, Y, Z_noace, "{} (No Usable Ace)".format(title))
+    plot_surface(X, Y, Z_ace, "{} (Usable Ace)".format(title))
+
 def sample_eps_greedy(Q, state, epsilon):
     if np.random.uniform() < epsilon:
         action = int(np.random.choice(range(2)))
@@ -53,11 +89,18 @@ def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
         total_rewards.append(total_reward)
         episode_lengths.append(length)
 
+    # Plot value function
+    V = defaultdict(float)
+    for state, actions in Q.items():
+        action_value = np.max(actions)
+        V[state] = action_value
+    plot_value_function(V, title="Optimal Value Function")
+
     return total_rewards, episode_lengths
 
 def main():
     env_name = "Blackjack-v0"
-    num_eps = 500000
+    num_eps = 50000
     sum_steps = 5000
 
     env = gym.make(env_name)
