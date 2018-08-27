@@ -81,6 +81,7 @@ def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
             episode.append((state, action, next_state, reward))
 
             Q[state][action] = Q[state][action] + lr * (reward + gamma * np.max(Q[next_state]) - Q[state][action])
+            Q[state][action] = np.clip(Q[state][action], -1, 1)
 
             total_reward += reward
             actions.append(action)
@@ -100,8 +101,8 @@ def sarsa(env, num_episodes, sum_steps, lr, gamma, eps):
 
 def main():
     env_name = "Blackjack-v0"
-    num_eps = 50000
-    sum_steps = 5000
+    num_eps = 500000
+    sum_steps = 50000
 
     env = gym.make(env_name)
 
